@@ -8,7 +8,7 @@ const database = new Database()
 export const routes = [
     {
         method: 'GET',
-        path: '/tasks',
+        path: buildRoutePath('/tasks'),
         handler:(req, res)=>{
             const tasks = database.select('tasks')
         
@@ -19,16 +19,16 @@ export const routes = [
     },
     {
         method: 'POST',
-        path: '/tasks',
+        path: buildRoutePath('/tasks'),
         handler:(req, res)=>{
-            const {title, description,completed_at, updated_at} = req.body
+            const {title, description} = req.body
         const task ={
             id: randomUUID(),
             title,
             description,
-            completed_at,
+            completed_at: null,
             created_at: new Date().toLocaleString(),
-            updated_at
+            updated_at: null
         }
 
         database.insert('tasks', task)
@@ -42,8 +42,10 @@ export const routes = [
         method: 'PUT',
         path: buildRoutePath('/tasks/:id'),
         handler: (req, res)=>{
-            const { id } = req.params
-            const { title, description, completed_at, created_at, } = req.body
+            const { id,completed_at, created_at, } = req.params
+            const { title, description} = req.body
+            const teste = database.select('tasks') 
+            console.log(teste)
             database.update('tasks', id, {
                 title,
                 description,
@@ -52,15 +54,20 @@ export const routes = [
                 updated_at :new Date().toLocaleString()
             })
 
-            return res.writeHead(204)
+
+
+            return res.writeHead(204).end()
         }
     },
     {
         method: 'DELETE',
-        path: buildRoutePath('/tasks/'),
+        path: buildRoutePath('/tasks/:id'),
         handler: (req, res)=>{
-            console.log('aaaa')
-            return res.writeHead(204)
+            const {id} = req.params
+            
+            database.delete('tasks', id)
+
+            return res.writeHead(204).end()
         }
     },
 ]
