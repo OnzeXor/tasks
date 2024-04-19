@@ -42,14 +42,17 @@ export const routes = [
         method: 'PUT',
         path: buildRoutePath('/tasks/:id'),
         handler: (req, res)=>{
-            const { id,completed_at, created_at, } = req.params
-            const { title, description} = req.body
-            const teste = database.select('tasks') 
-            console.log(teste)
+            const { id } = req.params
+            let { title, description} = req.body
+            const listaTasks = database.select('tasks').find(obj => obj.id === id);
+            title ??= listaTasks.title
+            description ??= listaTasks.description
+            const { completed_at, created_at } = listaTasks  
+            
             database.update('tasks', id, {
                 title,
                 description,
-                completed_at,
+                completed_at, 
                 created_at,
                 updated_at :new Date().toLocaleString()
             })
@@ -70,4 +73,22 @@ export const routes = [
             return res.writeHead(204).end()
         }
     },
+    {
+        method: 'PATCH',
+        path: buildRoutePath('/tasks/:id/complete'),
+        handler: (req, res)=>{
+            const {id} = req.params
+            const listaTasks = database.select('tasks').find(obj => obj.id === id);
+            const { title, description, created_at, updated_at } = listaTasks
+            database.update('tasks', id, {
+                title,
+                description,
+                completed_at :new Date().toLocaleString(), 
+                created_at,
+                updated_at 
+            })
+
+            return res.writeHead(204).end()
+        }
+    }
 ]
